@@ -1,6 +1,7 @@
 package compressor
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 )
@@ -65,4 +66,32 @@ func Registered(name string) error {
 		return fmt.Errorf("algorithm not registered: %s", name)
 	}
 	return nil
+}
+
+func Compression(a Algorithm, data []byte) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	w, err := a.NewCompressor(buf)
+	defer func(w Compressor) {
+		_ = w.Close()
+	}(w)
+	_, err = w.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func UnCompression(a Algorithm, data []byte) ([]byte, error) {
+	r, err := a.NewUnCompressor(bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
+	defer func(r UnCompressor) {
+		_ = r.Close()
+	}(r)
+	data, err = io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
