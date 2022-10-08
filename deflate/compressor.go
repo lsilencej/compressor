@@ -1,0 +1,4 @@
+package deflate
+
+func init() {
+}
