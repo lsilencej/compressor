@@ -81,3 +81,7 @@ func (z *zlibAlgorithm) SetOrder(order compressor.Order) error {
 func (z *zlibAlgorithm) SetLitWidth(litWidth compressor.LitWidth) error {
 	return errors.New("algorithm zlib don't need litWidth")
 }
+
+func init() {
+	compressor.Register("zlib", &zlibAlgorithm{})
+}
