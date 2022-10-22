@@ -17,7 +17,7 @@ type Algorithm interface {
 	UnCompress(data []byte) ([]byte, error)
 	SetLevel(level Level) error
 	SetOrder(order Order) error
-	SetLitWidth(litWidth int) error
+	SetLitWidth(litWidth LitWidth) error
 }
 
 // Compressor interface
@@ -46,6 +46,9 @@ const (
 // Order specifies the bit ordering in an LZW data stream.
 type Order int
 
+// LitWidth the number of bits to use for literal codes
+type LitWidth int
+
 const (
 	// LSB means Least Significant Bits first, as used in the GIF file format.
 	LSB Order = iota
@@ -68,7 +71,7 @@ func Registered(name string) error {
 	return nil
 }
 
-func Compression(a Algorithm, data []byte) ([]byte, error) {
+func Compress(a Algorithm, data []byte) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 	w, err := a.NewCompressor(buf)
 	defer func(w Compressor) {
@@ -81,7 +84,7 @@ func Compression(a Algorithm, data []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func UnCompression(a Algorithm, data []byte) ([]byte, error) {
+func UnCompress(a Algorithm, data []byte) ([]byte, error) {
 	r, err := a.NewUnCompressor(bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
