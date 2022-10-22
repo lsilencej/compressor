@@ -12,27 +12,27 @@ type gzipAlgorithm struct {
 }
 
 type gzipCompressor struct {
-	write *gzip.Writer
+	writer *gzip.Writer
 }
 
 type gzipUnCompressor struct {
-	read *gzip.Reader
+	reader *gzip.Reader
 }
 
-func (c gzipCompressor) Write(data []byte) (int, error) {
-	return c.write.Write(data)
+func (c *gzipCompressor) Write(data []byte) (int, error) {
+	return c.writer.Write(data)
 }
 
-func (c gzipCompressor) Close() error {
-	return c.write.Close()
+func (c *gzipCompressor) Close() error {
+	return c.writer.Close()
 }
 
-func (uc gzipUnCompressor) Read(data []byte) (int, error) {
-	return uc.read.Read(data)
+func (uc *gzipUnCompressor) Read(data []byte) (int, error) {
+	return uc.reader.Read(data)
 }
 
-func (uc gzipUnCompressor) Close() error {
-	return uc.read.Close()
+func (uc *gzipUnCompressor) Close() error {
+	return uc.reader.Close()
 }
 
 func (g *gzipAlgorithm) NewAlgorithm() compressor.Algorithm {
@@ -42,10 +42,10 @@ func (g *gzipAlgorithm) NewAlgorithm() compressor.Algorithm {
 func (g *gzipAlgorithm) NewCompressor(w io.Writer) (compressor.Compressor, error) {
 	c := &gzipCompressor{}
 	if g.level == 0 {
-		c.write = gzip.NewWriter(w)
+		c.writer = gzip.NewWriter(w)
 	} else {
 		var err error
-		if c.write, err = gzip.NewWriterLevel(w, int(g.level)); err != nil {
+		if c.writer, err = gzip.NewWriterLevel(w, int(g.level)); err != nil {
 			return nil, err
 		}
 	}
@@ -55,7 +55,7 @@ func (g *gzipAlgorithm) NewCompressor(w io.Writer) (compressor.Compressor, error
 func (g *gzipAlgorithm) NewUnCompressor(r io.Reader) (compressor.UnCompressor, error) {
 	uc := &gzipUnCompressor{}
 	var err error
-	if uc.read, err = gzip.NewReader(r); err != nil {
+	if uc.reader, err = gzip.NewReader(r); err != nil {
 		return nil, err
 	}
 	return uc, err
